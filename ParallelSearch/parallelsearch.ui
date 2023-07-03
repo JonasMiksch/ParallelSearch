@@ -1,0 +1,25 @@
+<UI version="4.0" >
+ <class>ParallelSearchClass</class>
+ <widget class="QWidget" name="ParallelSearchClass" >
+  <property name="objectName" >
+   <string notr="true">ParallelSearchClass</string>
+  </property>
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>400</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>ParallelSearch</string>
+  </property>$centralwidget$
+ </widget>
+ <layoutDefault spacing="6" margin="11" />
+ <pixmapfunction></pixmapfunction>
+ <resources>
+   <include location="parallelsearch.qrc"/>
+ </resources>
+ <connections/>
+</UI>
