@@ -27,32 +27,40 @@ class MyWidget : public QWidget {
     Q_OBJECT
 private:
     QLineEdit* m_inputLineEdit;
+
     QPushButton* m_button1;
     QPushButton* m_button2;
 
     QLabel* m_outputLabel1;
     QLabel* m_outputLabel2;
     QLabel* m_outputLabel3;
+
     QListWidget* m_listWidget;
+
     QCheckBox* m_checkbox;
     QCheckBox* m_checkbox2;
+    QCheckBox* m_checkbox3;
 
     vector<string> m_results;
     vector<string> m_list;
     vector<string> m_theoreticalList;
     vector<string> m_practicalList;
-    mutex m_mutex;
+
     set<string> m_sortedList;
     set<string> m_sortedTheoreticalList;
     set<string> m_sortedPracticalList;
 
+    mutex m_mutex;
+
     string m_searchString;
+
     bool m_lastSearchLinear = false;
     bool m_caseInsensitive = false;
     bool m_toggle = false;
+    bool m_incrementel = false;
+
     Ui::ParallelSearchClass ui;
     void multiSearch(string type);
-
     void linearSearch(vector<string>::iterator start, vector<string>::iterator end);
     void setSearch(set<string>::iterator start, set<string>::iterator end);
 
@@ -65,11 +73,23 @@ private slots:
 
     void handleCheckboxStateChanged1(int state);
     void handleCheckboxStateChanged2(int state);
+    void handleCheckboxStateChanged3(int state);
+
+    void newInput(const QString& txt);
 
 public:
     void setTheoreticalList(vector<string> list);
     void setPracticalSet(set<string> list);
     MyWidget(QWidget* parent = nullptr);
-
 };
-string toLowercase(const string& str);
+inline string toLowercase(const string& str) {
+    /**
+    * helper-function for converting a string to lowercase
+    * @param tring{linear, sorted} sets the type of search algorithm
+    */
+    string result = str;
+    transform(result.begin(), result.end(), result.begin(), [](unsigned char c) {
+        return tolower(c);
+        });
+    return result;
+}

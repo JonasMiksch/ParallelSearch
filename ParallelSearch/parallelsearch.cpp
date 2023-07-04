@@ -16,6 +16,7 @@ MyWidget::MyWidget(QWidget* parent) : QWidget(parent) {
     m_listWidget = new QListWidget(this);
     m_checkbox = new QCheckBox("Activate search independent from lower/uppercase ", this);
     m_checkbox2 = new QCheckBox("Search in practical list ", this);
+    m_checkbox3 = new QCheckBox("Enable Incremental search ", this);
 
 
     //create layout
@@ -31,6 +32,7 @@ MyWidget::MyWidget(QWidget* parent) : QWidget(parent) {
     rightLayout->addWidget(m_button2);
     rightLayout->addWidget(m_checkbox);
     rightLayout->addWidget(m_checkbox2);
+    rightLayout->addWidget(m_checkbox3);
     
     bottomLayout->addWidget(m_listWidget);
     mainLayout->addLayout(topLayout);
@@ -42,8 +44,34 @@ MyWidget::MyWidget(QWidget* parent) : QWidget(parent) {
     connect(m_button2, &QPushButton::clicked, this, &MyWidget::on_button2Clicked);
     connect(m_checkbox, &QCheckBox::stateChanged, this, &MyWidget::handleCheckboxStateChanged1);
     connect(m_checkbox2, &QCheckBox::stateChanged, this, &MyWidget::handleCheckboxStateChanged2);
+    connect(m_checkbox3, &QCheckBox::stateChanged, this, &MyWidget::handleCheckboxStateChanged3);
+    connect(m_inputLineEdit, &QLineEdit::textChanged, this, &MyWidget::newInput);
+}
+
+
+
+void MyWidget::newInput(const QString& txt) {
+/**
+* search function starting when a new character is typed into input, uses sorted search, enabled by m_checkbox3
+* @param txt user set input txt in the qt input line
+*/
+    if (m_incrementel) {
+        m_searchString = txt.toStdString();
+        m_results.clear();
+        this->multiSearch("sorted");
+        QStringList qStringList;
+        for (const auto& result : m_results) {
+            qStringList << QString::fromStdString(result);
+        }
+        m_listWidget->clear();
+        m_listWidget->addItems(qStringList);
+    }
 }
 void MyWidget::setTheoreticalList(vector<string> list)
+/**
+* set m_list as standard search list to theoretical list created in main
+* @param list vector<string> list created in main
+*/
 {
     m_list = list;
     m_theoreticalList = list;
@@ -51,12 +79,20 @@ void MyWidget::setTheoreticalList(vector<string> list)
     m_sortedList = m_sortedTheoreticalList;
 }
 void MyWidget::setPracticalSet(set<string> list)
+/**
+* set list as search list to practical list created in main
+* @param list set<string> set created in main
+*/
 {
     m_sortedPracticalList = list;
     vector<string> myVector(m_sortedPracticalList.begin(), m_sortedPracticalList.end());
     m_practicalList = myVector;
 }
 void MyWidget::handleCheckboxStateChanged1(int state)
+/**
+* toggle case insensitivity and m_toggle so the search is performed and not "Result already showing"
+* @param state: checked or unchecked
+*/ 
 {
     if (state == Qt::Checked) {
         m_caseInsensitive = true;
@@ -68,6 +104,10 @@ void MyWidget::handleCheckboxStateChanged1(int state)
     }
 }
 void MyWidget::handleCheckboxStateChanged2(int state)
+/**
+* toggle between theoretical and practical list
+* @param state: checked or unchecked
+*/
 {
     if (state == Qt::Checked) {
         
@@ -81,7 +121,24 @@ void MyWidget::handleCheckboxStateChanged2(int state)
         m_toggle = true;
     }
 }
-void MyWidget::on_button1Clicked() {
+void MyWidget::handleCheckboxStateChanged3(int state)
+/**
+* toggle incremental search 
+* @param state: checked or unchecked
+*/
+{
+    if (state == Qt::Checked) {
+        m_incrementel = true;
+    }
+    else {
+        m_incrementel = false;
+    }
+}
+void MyWidget::on_button1Clicked()
+/**
+* perform linear multithreaded search function on button click
+*/
+{
     QString userInput = m_inputLineEdit->text();
     string input = userInput.toStdString();
     if (userInput == "") {
@@ -89,7 +146,7 @@ void MyWidget::on_button1Clicked() {
     }
     else if(input == m_searchString && (!m_lastSearchLinear && !m_toggle)) {
 
-        m_outputLabel1->setText("Das Ergebnis wird bereits angezeigt");
+        m_outputLabel1->setText("Result already showing");
     }
     else {
         m_results.clear();
@@ -117,7 +174,11 @@ void MyWidget::on_button1Clicked() {
     }
 }
 
-void MyWidget::on_button2Clicked() {
+void MyWidget::on_button2Clicked()
+/**
+* perform sorted  multithreaded search function on button click
+*/
+{
     QString userInput = m_inputLineEdit->text();
     string input = userInput.toStdString();
 
@@ -153,14 +214,14 @@ void MyWidget::on_button2Clicked() {
     }
 }
 
+
+void MyWidget::multiSearch(string type)
 /**
-* a normal member taking two arguments and returning an integer value.
-* @param a an integer argument.
+* multithreaded search function
+* @param type string{linear, sorted} sets the type of search algorithm
 * @param s a constant character pointer.
 * @return The test results
 */
-
-void MyWidget::multiSearch(string type)
 {
     const int numThreads = std::thread::hardware_concurrency();
     vector<std::thread> threads;
@@ -208,6 +269,11 @@ void MyWidget::multiSearch(string type)
 
 
 void MyWidget::linearSearch(vector<string>::iterator start, vector<string>::iterator end)
+/**
+* linear search function
+* @param start iterator to the start of the area of interest  
+* @param end iterator to the end of the area of interest  
+*/
 {
     vector<string> localResults;
     for (; start != end; ++start) {
@@ -235,8 +301,12 @@ void MyWidget::linearSearch(vector<string>::iterator start, vector<string>::iter
 
 
 
-//mit neuer Liste 648 ms
 void MyWidget::setSearch(set<string>::iterator start, set<string>::iterator end) {
+/**
+* sorted search function
+* @param start iterator to the start of the area of interest  
+* @param end iterator to the end of the area of interest  
+*/
     vector<string> localResults;
     set<string>::iterator lower, upper;
     if (m_caseInsensitive) {
@@ -262,10 +332,3 @@ void MyWidget::setSearch(set<string>::iterator start, set<string>::iterator end)
 }
 
 
-string toLowercase(const string& str) {
-    string result = str;
-    transform(result.begin(), result.end(), result.begin(), [](unsigned char c) {
-        return tolower(c);
-        });
-    return result;
-}
