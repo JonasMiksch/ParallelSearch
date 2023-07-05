@@ -1,16 +1,20 @@
+/*
+  File: parallelsearch.cpp
+  Author: Jonas Miksch
+  Company: on behalf of Vector Informatik GmbH 
+  Created: 29.06.2023
+  Modified: 6.07.2023
+*/
+
 #include "parallelsearch.h"
-
-
-
-
 
 MyWidget::MyWidget(QWidget* parent) : QWidget(parent) {
 
     //create widgets;
     m_inputLineEdit = new QLineEdit(this);
-    m_button1 = new QPushButton("Linear Search", this);
-    m_button2 = new QPushButton("Sorted Search", this);
-    m_button3 = new QPushButton("Evaluate speed", this);
+    m_buttonLinear = new QPushButton("Linear Search", this);
+    m_buttonSorted = new QPushButton("Sorted Search", this);
+    m_buttonEvaluate = new QPushButton("Evaluate speed", this);
     m_outputLabel1 = new QLabel(this);
     m_outputLabel2 = new QLabel(this);
     m_outputLabel3 = new QLabel(this);
@@ -29,9 +33,9 @@ MyWidget::MyWidget(QWidget* parent) : QWidget(parent) {
     rightLayout->addWidget(m_outputLabel1);
     rightLayout->addWidget(m_outputLabel2);
     rightLayout->addWidget(m_outputLabel3);
-    rightLayout->addWidget(m_button1);
-    rightLayout->addWidget(m_button2);
-    rightLayout->addWidget(m_button3);
+    rightLayout->addWidget(m_buttonLinear);
+    rightLayout->addWidget(m_buttonSorted);
+    rightLayout->addWidget(m_buttonEvaluate);
     rightLayout->addWidget(m_checkbox);
     rightLayout->addWidget(m_checkbox2);
     rightLayout->addWidget(m_checkbox3);
@@ -42,12 +46,12 @@ MyWidget::MyWidget(QWidget* parent) : QWidget(parent) {
     mainLayout->addLayout(rightLayout);
 
     //connect widgets to functions
-    connect(m_button1, &QPushButton::clicked, this, &MyWidget::on_button1Clicked);
-    connect(m_button2, &QPushButton::clicked, this, &MyWidget::on_button2Clicked);
-    connect(m_button3, &QPushButton::clicked, this, &MyWidget::on_button3Clicked);
-    connect(m_checkbox, &QCheckBox::stateChanged, this, &MyWidget::handleCheckboxStateChanged1);
-    connect(m_checkbox2, &QCheckBox::stateChanged, this, &MyWidget::handleCheckboxStateChanged2);
-    connect(m_checkbox3, &QCheckBox::stateChanged, this, &MyWidget::handleCheckboxStateChanged3);
+    connect(m_buttonLinear, &QPushButton::clicked, this, &MyWidget::on_button1Clicked);
+    connect(m_buttonSorted, &QPushButton::clicked, this, &MyWidget::on_button2Clicked);
+    connect(m_buttonEvaluate, &QPushButton::clicked, this, &MyWidget::on_button3Clicked);
+    connect(m_checkbox, &QCheckBox::stateChanged, this, &MyWidget::activateCaseInsensitivity);
+    connect(m_checkbox2, &QCheckBox::stateChanged, this, &MyWidget::activatePracticalList);
+    connect(m_checkbox3, &QCheckBox::stateChanged, this, &MyWidget::activateIncrementalSearch);
     connect(m_inputLineEdit, &QLineEdit::textChanged, this, &MyWidget::newInput);
 
     m_numThreads = std::thread::hardware_concurrency();
@@ -101,7 +105,7 @@ void MyWidget::setPracticalSet(set<string> list)
 * toggle case insensitivity and m_toggle so the search is performed and not "Result already showing"
 * @param state: checked or unchecked
 */
-void MyWidget::handleCheckboxStateChanged1(int state)
+void MyWidget::activateCaseInsensitivity(int state)
 {
     if (state == Qt::Checked) {
         m_caseInsensitive = true;
@@ -116,7 +120,7 @@ void MyWidget::handleCheckboxStateChanged1(int state)
 * toggle between theoretical and practical list
 * @param state: checked or unchecked
 */
-void MyWidget::handleCheckboxStateChanged2(int state)
+void MyWidget::activatePracticalList(int state)
 {
     if (state == Qt::Checked) {
         
@@ -134,7 +138,7 @@ void MyWidget::handleCheckboxStateChanged2(int state)
 * toggle incremental search
 * @param state: checked or unchecked
 */
-void MyWidget::handleCheckboxStateChanged3(int state)
+void MyWidget::activateIncrementalSearch(int state)
 {
     if (state == Qt::Checked) {
         m_incrementel = true;
@@ -151,17 +155,16 @@ void MyWidget::on_button1Clicked()
     QString userInput = m_inputLineEdit->text();
     string input = userInput.toStdString();
     if (userInput == "") {
-        m_outputLabel1->setText("Bitte validen Suchstring eingeben");
+        m_outputLabel1->setText("Enter valid string");
     }
     else if(input == m_searchString && (m_lastSearchLinear && !m_toggle)) {
-
         m_outputLabel1->setText("Result already showing");
     }
     else {
         m_results.clear();
         m_searchString = input;
 
-        m_outputLabel1->setText("Der Suchstring lautet: " + userInput);
+        m_outputLabel1->setText("Searchstring is: " + userInput);
 
         auto start = std::chrono::high_resolution_clock::now();
         this->multiSearch("linear");
@@ -174,8 +177,8 @@ void MyWidget::on_button1Clicked()
         m_listWidget->clear();
         m_listWidget->addItems(qStringList);
 
-        m_outputLabel3->setText("Anzahl gefundener Elemente: " + QString::number(m_results.size()));
-        m_outputLabel2->setText("Die lineare Suche dauerte " +
+        m_outputLabel3->setText("Number of found elements: " + QString::number(m_results.size()));
+        m_outputLabel2->setText("Linear search took:  " +
             QString::fromStdString((std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()))) +
             " ms");
         m_lastSearchLinear = true;
@@ -192,10 +195,10 @@ void MyWidget::on_button2Clicked()
     string input = userInput.toStdString();
 
     if (userInput == "") {
-        m_outputLabel1->setText("Bitte validen Suchstring eingeben");
+        m_outputLabel1->setText("Enter valid string");
     }
     else if (input == m_searchString && (!m_lastSearchLinear && !m_toggle)) {
-        m_outputLabel1->setText("Das Ergebnis wird bereits angezeigt");
+        m_outputLabel1->setText("Result already showing");
     }
     else {
         m_results.clear();
@@ -214,8 +217,8 @@ void MyWidget::on_button2Clicked()
         m_listWidget->clear();
         m_listWidget->addItems(qStringList);
 
-        m_outputLabel3->setText("Anzahl gefundener Elemente: " + QString::number(m_results.size()));
-        m_outputLabel2->setText("Die sortierte Suche dauerte " +
+        m_outputLabel3->setText("Number of found elements: " + QString::number(m_results.size()));
+        m_outputLabel2->setText("Sorted search took: " +
             QString::fromStdString((std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()))) +
             "ms");
         m_lastSearchLinear = false;
@@ -229,101 +232,89 @@ void MyWidget::on_button3Clicked()
 {
     QString userInput = m_inputLineEdit->text();
     string input = userInput.toStdString();
+    m_results.clear();
+    m_searchString = input;
 
-    if (userInput == "") {
-        m_outputLabel1->setText("Bitte validen Suchstring eingeben");
-    }
-    else if (input == m_searchString && (!m_lastSearchLinear && !m_toggle)) {
-        m_outputLabel1->setText("Das Ergebnis wird bereits angezeigt");
-    }
-    else {
+    int bufferThreads = m_numThreads;
+    std::chrono::milliseconds totalTimeS(0);
+    std::chrono::milliseconds totalTime(0);
+    std::chrono::milliseconds totalTimeS1(0);
+    std::chrono::milliseconds totalTime1(0);
+
+    for (int i = 0; i < 10; ++i) {
+        //sweet spot ~8-12 threads;
+        auto startS = std::chrono::high_resolution_clock::now();
+        this->multiSearch("sorted");
+        auto endS = std::chrono::high_resolution_clock::now();
+        std::chrono::milliseconds durationS = std::chrono::duration_cast<std::chrono::milliseconds>(endS - startS);
+        totalTimeS += durationS;
+
         m_results.clear();
-        m_searchString = input;
-
-        int bufferThreads = m_numThreads;
-        std::chrono::milliseconds totalTimeS(0);
-        std::chrono::milliseconds totalTime(0);
-        std::chrono::milliseconds totalTimeS1(0);
-        std::chrono::milliseconds totalTime1(0);
-
-        for (int i = 0; i < 10; ++i) {
-            //sweet spot ~8-12 threads;
-            auto startS = std::chrono::high_resolution_clock::now();
-            this->multiSearch("sorted");
-            auto endS = std::chrono::high_resolution_clock::now();
-            std::chrono::milliseconds durationS = std::chrono::duration_cast<std::chrono::milliseconds>(endS - startS);
-            totalTimeS += durationS;
-  
-            m_results.clear();
-            auto start = std::chrono::high_resolution_clock::now();
-            this->multiSearch("linear");
-            auto end = std::chrono::high_resolution_clock::now();
-            std::chrono::milliseconds duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-            totalTime += duration;   
-        }
-
-        m_numThreads = 1;
-
-
-
-        for (int j = 0; j < 10; ++j) {
-            m_results.clear();
-            auto startS1 = std::chrono::high_resolution_clock::now();
-            this->multiSearch("sorted");
-            auto endS1 = std::chrono::high_resolution_clock::now();
-            std::chrono::milliseconds durationS1 = std::chrono::duration_cast<std::chrono::milliseconds>(endS1 - startS1);
-            totalTimeS1 += durationS1;
-
-            m_results.clear();
-            auto start1 = std::chrono::high_resolution_clock::now();
-            this->multiSearch("linear");
-            auto end1 = std::chrono::high_resolution_clock::now();
-            std::chrono::milliseconds duration1 = std::chrono::duration_cast<std::chrono::milliseconds>(end1 - start1);
-            totalTime1 += duration1;
-        }
-        m_numThreads = bufferThreads;
-
-        totalTime /= 10;
-        totalTime1 /= 10;
-        totalTimeS /= 10;
-        totalTimeS1 /= 10;
-        m_outputLabel1->setText("Linear average " +
-            QString::fromStdString(std::to_string(totalTime.count())) +
-            "ms " + "Linear average 1 Thread " +
-            QString::fromStdString(std::to_string(totalTime1.count())) +
-            "ms ");
-
-        m_outputLabel2->setText("Sorted average " +
-            QString::fromStdString(std::to_string(totalTimeS.count())) +
-            "ms " + "Sorted average 1 Thread " +
-            QString::fromStdString(std::to_string(totalTimeS1.count())) +
-            "ms ");
-
-        m_outputLabel3->setText("Set creation time " +
-            QString::fromStdString(std::to_string(m_timeSet.count())) +
-            "ms ");
-
-
-        m_lastSearchLinear = false;
-        m_toggle = false;
+        auto start = std::chrono::high_resolution_clock::now();
+        this->multiSearch("linear");
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::milliseconds duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+        totalTime += duration;
     }
+
+    m_numThreads = 1;
+
+    for (int j = 0; j < 10; ++j) {
+        m_results.clear();
+        auto startS1 = std::chrono::high_resolution_clock::now();
+        this->multiSearch("sorted");
+        auto endS1 = std::chrono::high_resolution_clock::now();
+        std::chrono::milliseconds durationS1 = std::chrono::duration_cast<std::chrono::milliseconds>(endS1 - startS1);
+        totalTimeS1 += durationS1;
+
+        m_results.clear();
+        auto start1 = std::chrono::high_resolution_clock::now();
+        this->multiSearch("linear");
+        auto end1 = std::chrono::high_resolution_clock::now();
+        std::chrono::milliseconds duration1 = std::chrono::duration_cast<std::chrono::milliseconds>(end1 - start1);
+        totalTime1 += duration1;
+    }
+    m_numThreads = bufferThreads;
+
+    totalTime /= 10;
+    totalTime1 /= 10;
+    totalTimeS /= 10;
+    totalTimeS1 /= 10;
+
+    m_outputLabel1->setText("Linear average " +
+        QString::fromStdString(std::to_string(totalTime.count())) +
+        "ms ||" + "Linear average 1 Thread " +
+        QString::fromStdString(std::to_string(totalTime1.count())) +
+        "ms ");
+
+    m_outputLabel2->setText("Sorted average " +
+        QString::fromStdString(std::to_string(totalTimeS.count())) +
+        "ms ||" + "Sorted average 1 Thread " +
+        QString::fromStdString(std::to_string(totalTimeS1.count())) +
+        "ms ");
+
+    m_outputLabel3->setText("Set creation time " +
+        QString::fromStdString(std::to_string(m_timeSet.count())) +
+        "ms ");
+
+
+    m_lastSearchLinear = false;
+    m_toggle = false;
+
 }
 
 /**
 * multithreaded search function
-* @param type string{linear, sorted} sets the type of search algorithm
-* @param s a constant character pointer.
+* @param type string (linear, sorted) sets the type of search algorithm
 * @return The test results
 */
 void MyWidget::multiSearch(string type)
-{
-    
+{  
     vector<std::thread> threads;
 
     vector<string>::iterator start_vec;
     set<string>::iterator start_set;
     int teilliste = 0;
-    int bufThread = m_numThreads;
 
     if (type == "linear") {
         teilliste = m_list.size() / m_numThreads;
@@ -374,8 +365,8 @@ void MyWidget::linearSearch(vector<string>::iterator start, vector<string>::iter
             //check ob das wort größer als der suchstring ist
             if (start->size() >= m_searchString.size()) {
                 if (m_caseInsensitive) {
-                    string saerchs = m_searchString;
-                    if (toLowercase(start->substr(0, m_searchString.size())) == toLowercase(saerchs)) {
+                    string searchS = m_searchString;
+                    if (toLowercase(start->substr(0, m_searchString.size())) == toLowercase(searchS)) {
                         localResults.push_back(*start);
                     }
                 }
@@ -402,11 +393,11 @@ void MyWidget::setSearch(set<string>::iterator start, set<string>::iterator end)
     set<string> localResults;
     set<string>::iterator lower, upper;
     if (m_caseInsensitive) {
-        string saerchs = m_searchString;
-        lower = lower_bound(start, end, saerchs, [](const std::string& lhs, const std::string& rhs) {
+        string searchS = m_searchString;
+        lower = lower_bound(start, end, searchS, [](const std::string& lhs, const std::string& rhs) {
             return toLowercase(lhs) < toLowercase(rhs);
             });
-        upper = upper_bound(start, end, saerchs + "\xFF", [](const std::string& lhs, const std::string& rhs) {
+        upper = upper_bound(start, end, searchS + "\xFF", [](const std::string& lhs, const std::string& rhs) {
             return toLowercase(lhs) < toLowercase(rhs);
             });
     }
@@ -415,7 +406,6 @@ void MyWidget::setSearch(set<string>::iterator start, set<string>::iterator end)
         upper = upper_bound(start, end, m_searchString + "\xFF");
     }
 
-    // Iterate through the range of elements with the leading search string
     for (; lower != upper; ++lower) {
         localResults.insert(*lower);
     }

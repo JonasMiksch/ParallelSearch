@@ -77,7 +77,8 @@ set<string> loadList()
 */
 int main(int argc, char* argv[])
 {
-
+    string A = "AA";
+    A = A + "\xFF";
     QApplication a(argc, argv);
     MyWidget w;
     w.setPracticalSet(loadList());
@@ -87,4 +88,6 @@ int main(int argc, char* argv[])
     return a.exec();
 
 }
+
+
 

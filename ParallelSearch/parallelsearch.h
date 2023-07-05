@@ -36,9 +36,9 @@ class MyWidget : public QWidget {
 private:
     QLineEdit* m_inputLineEdit;
 
-    QPushButton* m_button1;
-    QPushButton* m_button2;
-    QPushButton* m_button3;
+    QPushButton* m_buttonLinear;
+    QPushButton* m_buttonSorted;
+    QPushButton* m_buttonEvaluate;
 
     QLabel* m_outputLabel1;
     QLabel* m_outputLabel2;
@@ -86,9 +86,9 @@ private slots:
     void on_button2Clicked();
     void on_button3Clicked();
 
-    void handleCheckboxStateChanged1(int state);
-    void handleCheckboxStateChanged2(int state);
-    void handleCheckboxStateChanged3(int state);
+    void activateCaseInsensitivity(int state);
+    void activatePracticalList(int state);
+    void activateIncrementalSearch(int state);
 
     void newInput(const QString& txt);
 
@@ -97,11 +97,11 @@ public:
     void setPracticalSet(set<string> list);
     MyWidget(QWidget* parent = nullptr);
 };
+/**
+* helper-function for converting a string to lowercase
+* @param tring{linear, sorted} sets the type of search algorithm
+*/
 inline string toLowercase(const string& str) {
-    /**
-    * helper-function for converting a string to lowercase
-    * @param tring{linear, sorted} sets the type of search algorithm
-    */
     string result = str;
     transform(result.begin(), result.end(), result.begin(), [](unsigned char c) {
         return tolower(c);
