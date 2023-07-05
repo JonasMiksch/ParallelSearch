@@ -6,13 +6,13 @@
 using namespace std;
 std::string filename = "C:\\Jonas\\Coden\\Vector_JM\\ParallelSearch\\mit.edu_~ecprice_wordlist.10000.txt";
 
-void recursiveGenerator(vector<string>& list, string word, int depth)
 /**
 * rekursiv helper function to create all words from AAAA to ZZZZ
 * @param list: the resulting list
 * @param word: the newly created word up to depth
 * @param depth: number of characters added to the word;0-4
 */
+void recursiveGenerator(vector<string>& list, string word, int depth)
 {
     if (depth == 4) {
         list.push_back(word);
@@ -23,10 +23,10 @@ void recursiveGenerator(vector<string>& list, string word, int depth)
         recursiveGenerator(list, newWord, depth + 1);
     }
 }
-vector<string> generateList() 
 /**
 * generate a list for the search algorithm containing all words from AAAA to ZZZZ
 */
+vector<string> generateList() 
 {
     vector<string> list;
     recursiveGenerator(list, "", 0);
@@ -38,10 +38,10 @@ vector<string> generateList()
     assert(list.size() == pow(26, 4));
     return list;
 }
-set<string> loadList()
 /**
 * load a list for the search algorithm specified in global parameter filename
 */
+set<string> loadList()
 {
     fstream file(filename, ios::in);
     string line, word;
@@ -63,10 +63,10 @@ set<string> loadList()
     }
     return words;
 }
-int main(int argc, char* argv[])
 /**
 * load and set lists, create GUI for the search algoritms
 */
+int main(int argc, char* argv[])
 {
 
     QApplication a(argc, argv);

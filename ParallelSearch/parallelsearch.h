@@ -30,6 +30,7 @@ private:
 
     QPushButton* m_button1;
     QPushButton* m_button2;
+    QPushButton* m_button3;
 
     QLabel* m_outputLabel1;
     QLabel* m_outputLabel2;
@@ -50,6 +51,10 @@ private:
     set<string> m_sortedTheoreticalList;
     set<string> m_sortedPracticalList;
 
+    std::chrono::milliseconds m_timeSet;
+
+    int m_numThreads;
+
     mutex m_mutex;
 
     string m_searchString;
@@ -58,6 +63,7 @@ private:
     bool m_caseInsensitive = false;
     bool m_toggle = false;
     bool m_incrementel = false;
+
 
     Ui::ParallelSearchClass ui;
     void multiSearch(string type);
@@ -70,6 +76,7 @@ private:
 private slots:
     void on_button1Clicked();
     void on_button2Clicked();
+    void on_button3Clicked();
 
     void handleCheckboxStateChanged1(int state);
     void handleCheckboxStateChanged2(int state);
