@@ -247,6 +247,7 @@ void MyWidget::on_button3Clicked()
         std::chrono::milliseconds totalTime1(0);
 
         for (int i = 0; i < 10; ++i) {
+            //sweet spot ~8-12 threads;
             auto startS = std::chrono::high_resolution_clock::now();
             this->multiSearch("sorted");
             auto endS = std::chrono::high_resolution_clock::now();
@@ -258,7 +259,7 @@ void MyWidget::on_button3Clicked()
             this->multiSearch("linear");
             auto end = std::chrono::high_resolution_clock::now();
             std::chrono::milliseconds duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-            totalTime += duration;      
+            totalTime += duration;   
         }
 
         m_numThreads = 1;

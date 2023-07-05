@@ -1,3 +1,11 @@
+/*
+File: parallelsearch.h
+Author : Jonas Miksch
+Company : on behalf of Vector Informatik GmbH
+Created : 29.06.2023
+Modified : 6.07.2023
+*/
+
 #pragma once
 #include <QtWidgets/QWidget>
 #include "ui_parallelsearch.h"
