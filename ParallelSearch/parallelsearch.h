@@ -97,10 +97,11 @@ public:
     void setPracticalSet(set<string> list);
     MyWidget(QWidget* parent = nullptr);
 };
+
 /**
-* helper-function for converting a string to lowercase
-* @param tring{linear, sorted} sets the type of search algorithm
-*/
+ * helper-function for converting a string to lowercase
+ * @param tring{linear, sorted} sets the type of search algorithm
+ */
 inline string toLowercase(const string& str) {
     string result = str;
     transform(result.begin(), result.end(), result.begin(), [](unsigned char c) {

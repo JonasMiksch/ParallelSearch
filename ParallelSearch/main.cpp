@@ -16,11 +16,11 @@ using namespace std;
 std::string filename = "C:\\Jonas\\Coden\\Vector_JM\\ParallelSearch\\mit.edu_~ecprice_wordlist.10000.txt";
 
 /**
-* rekursiv helper function to create all words from AAAA to ZZZZ
-* @param list: the resulting list
-* @param word: the newly created word up to depth
-* @param depth: number of characters added to the word;0-4
-*/
+ * rekursiv helper function to create all words from AAAA to ZZZZ
+ * @param list: the resulting list
+ * @param word: the newly created word up to depth
+ * @param depth: number of characters added to the word;0-4
+ */
 void recursiveGenerator(vector<string>& list, string word, int depth)
 {
     if (depth == 4) {
@@ -32,9 +32,10 @@ void recursiveGenerator(vector<string>& list, string word, int depth)
         recursiveGenerator(list, newWord, depth + 1);
     }
 }
+
 /**
-* generate a list for the search algorithm containing all words from AAAA to ZZZZ
-*/
+ * generate a list for the search algorithm containing all words from AAAA to ZZZZ
+ */
 vector<string> generateList() 
 {
     vector<string> list;
@@ -47,9 +48,10 @@ vector<string> generateList()
     assert(list.size() == pow(26, 4));
     return list;
 }
+
 /**
-* load a list for the search algorithm specified in global parameter filename
-*/
+ * load a list for the search algorithm specified in global parameter filename
+ */
 set<string> loadList()
 {
     fstream file(filename, ios::in);
@@ -72,13 +74,12 @@ set<string> loadList()
     }
     return words;
 }
+
 /**
-* load and set lists, create GUI for the search algoritms
-*/
+ * load and set lists, create GUI for the search algoritms
+ */
 int main(int argc, char* argv[])
 {
-    string A = "AA";
-    A = A + "\xFF";
     QApplication a(argc, argv);
     MyWidget w;
     w.setPracticalSet(loadList());
