@@ -6,15 +6,14 @@
   Modified: 6.07.2023
 */
 
-
 #include "parallelsearch.h"
 #include <QtWidgets/QApplication>
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <filesystem>
 using namespace std;
-std::string filename = "C:\\Jonas\\Coden\\Vector_JM\\ParallelSearch\\mit.edu_~ecprice_wordlist.10000.txt";
-
+std::string file = "\\mit.edu_~ecprice_wordlist.10000.txt";
 /**
  * rekursiv helper function to create all words from AAAA to ZZZZ
  * @param list: the resulting list
@@ -54,6 +53,15 @@ vector<string> generateList()
  */
 set<string> loadList()
 {
+    filesystem::path currentPath = filesystem::current_path();
+    string filename = currentPath.string();
+    std::string substring = "//ParallelSearch";
+    if (filename.substr(filename.length() - filename.length()) == filename) {
+        // Erase the substring
+        filename.erase(filename.length() - substring.length(), substring.length() - 1);
+    }
+
+    filename = filename + file;
     fstream file(filename, ios::in);
     string line, word;
     set<string> words;

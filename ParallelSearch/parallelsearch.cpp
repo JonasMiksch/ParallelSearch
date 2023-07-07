@@ -167,11 +167,12 @@ void MyWidget::on_button1Clicked()
         m_searchString = input;
 
         m_outputLabel1->setText("Searchstring is: " + userInput);
-
+        int bufThreads = m_numThreads;
+        m_numThreads = 1;
         auto start = std::chrono::high_resolution_clock::now();
         this->multiSearch("linear");
         auto end = std::chrono::high_resolution_clock::now();
-
+        m_numThreads = bufThreads;
         QStringList qStringList;
         for (const auto& result : m_results) {
             qStringList << QString::fromStdString(result);
@@ -316,7 +317,6 @@ void MyWidget::on_button3Clicked()
 void MyWidget::multiSearch(string type)
 {  
     vector<std::thread> threads;
-
     vector<string>::iterator start_vec;
     set<string>::iterator start_set;
     int partList = 0;
